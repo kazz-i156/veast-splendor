@@ -95,16 +95,16 @@ function resetField() {
 }
 function startGame() {
   loop = 1; score = 0; resetField();
-  P = { x: 150, y: H / 2, vy: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
+  P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
   setState('play'); msg = { text: 'MISSION START', t: 2 }; sfx('start');
 }
 function nextLoop() {
   loop++; resetField();
-  P.x = 150; P.y = H / 2; P.vy = 0; P.hp = P.maxhp; P.inv = 2;
+  P.x = 150; P.y = H / 2; P.vy = 0; P.thrust = 0; P.upT = 0; P.hp = P.maxhp; P.inv = 2;
   setState('play'); msg = { text: 'LOOP ' + loop, t: 2 }; sfx('start');
 }
 function setState(s) { state = s; stateT = 0; paused = false; }
-const GRAVITY = 180, MAX_FALL = 120; // 自機にかかる重力(px/s²)と最大落下速度(px/s)
+const GRAVITY = 320, MAX_FALL = 210; // 自機にかかる重力(px/s²)と最大落下速度(px/s)
 const diff = () => (1 + t / 70) * (1 + (loop - 1) * 0.35);
 
 /* ---------- Input ---------- */
@@ -153,6 +153,7 @@ addEventListener('pointermove', e => {
   const p = toLogical(e);
   P.x += (p.x - drag.x) * 1.3; P.y += (p.y - drag.y) * 1.3;
   if (Math.abs(p.y - drag.y) > 0.5) P.vy = 0; // 指で上下に動かしたら落下速度をリセット
+  if (p.y - drag.y < -0.5) P.upT = 0.12;       // 上方向へのドラッグ＝上昇噴射
   drag.x = p.x; drag.y = p.y;
 });
 const endDrag = e => { if (drag && drag.id === e.pointerId) drag = null; };
@@ -327,6 +328,9 @@ function update(dt) {
   const sp = keys.KeyC ? 170 : 340; // Cキーで低速移動
   P.x = clamp(P.x + mx * sp * dt, 30, W - 70);
   // 緩い重力：上下の入力がない間はゆっくり沈んでいく
+  if (my < 0) P.upT = 0.12;
+  P.upT = Math.max(0, (P.upT || 0) - dt);
+  P.thrust += ((P.upT > 0 ? 1 : 0) - P.thrust) * Math.min(1, dt * 12); // 噴射炎の大きさ(0〜1)をなめらかに変化
   if (my) P.vy = 0;
   else P.vy = Math.min(P.vy + GRAVITY * dt, MAX_FALL);
   P.y += (my * sp + P.vy) * dt;
@@ -412,9 +416,17 @@ function drawPlayer() {
   if (state === 'over') return;
   ctx.save(); ctx.translate(P.x, P.y); ctx.scale(1.25, 1.25);
   if (P.inv > 0 && Math.floor(P.inv * 20) % 2) ctx.globalAlpha = 0.35;
-  const f = 10 + Math.random() * 12;
-  poly([-24, -7, -24 - f, 0, -24, 7], '#4cf');
-  poly([-24, -4, -24 - f * 0.55, 0, -24, 4], '#fff');
+  const th = P.thrust || 0;                                                   // 上昇中は噴射炎が大きくなる
+  const f = (10 + Math.random() * 12) * (1 + th * 1.4), fw = 7 + th * 4;
+  poly([-24, -fw, -24 - f, 0, -24, fw], '#4cf');
+  poly([-24, -fw * 0.55, -24 - f * 0.55, 0, -24, fw * 0.55], '#fff');
+  if (th > 0.05) {                                                            // 足元の下向き噴射
+    const d = th * (14 + Math.random() * 12);
+    ctx.globalAlpha *= Math.min(1, th * 1.5);
+    poly([-26, 11, -20.5, 11 + d, -15, 11], '#4cf');
+    poly([-24, 11, -20.5, 11 + d * 0.55, -17, 11], '#fff');
+    ctx.globalAlpha = P.inv > 0 && Math.floor(P.inv * 20) % 2 ? 0.35 : 1;
+  }
   ctx.fillStyle = '#2a3350'; ctx.fillRect(-26, -13, 11, 24);                 // バックパック
   poly([-10, 7, -1, 7, -6, 23, -18, 23], '#8a94b8');                          // 脚
   poly([-18, 21, -4, 21, 2, 26, -18, 26], '#5a6488');
@@ -585,7 +597,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 resetField();
-P = { x: 150, y: H / 2, vy: 0, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
+P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
 score = 0;
 requestAnimationFrame(frame);
 </script>
