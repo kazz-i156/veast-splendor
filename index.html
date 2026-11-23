@@ -95,15 +95,16 @@ function resetField() {
 }
 function startGame() {
   loop = 1; score = 0; resetField();
-  P = { x: 150, y: H / 2, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
+  P = { x: 150, y: H / 2, vy: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
   setState('play'); msg = { text: 'MISSION START', t: 2 }; sfx('start');
 }
 function nextLoop() {
   loop++; resetField();
-  P.x = 150; P.y = H / 2; P.hp = P.maxhp; P.inv = 2;
+  P.x = 150; P.y = H / 2; P.vy = 0; P.hp = P.maxhp; P.inv = 2;
   setState('play'); msg = { text: 'LOOP ' + loop, t: 2 }; sfx('start');
 }
 function setState(s) { state = s; stateT = 0; paused = false; }
+const GRAVITY = 180, MAX_FALL = 120; // 自機にかかる重力(px/s²)と最大落下速度(px/s)
 const diff = () => (1 + t / 70) * (1 + (loop - 1) * 0.35);
 
 /* ---------- Input ---------- */
@@ -151,6 +152,7 @@ addEventListener('pointermove', e => {
   if (!drag || drag.id !== e.pointerId || state !== 'play' || paused) return;
   const p = toLogical(e);
   P.x += (p.x - drag.x) * 1.3; P.y += (p.y - drag.y) * 1.3;
+  if (Math.abs(p.y - drag.y) > 0.5) P.vy = 0; // 指で上下に動かしたら落下速度をリセット
   drag.x = p.x; drag.y = p.y;
 });
 const endDrag = e => { if (drag && drag.id === e.pointerId) drag = null; };
@@ -324,7 +326,12 @@ function update(dt) {
   if (mx && my) { mx *= 0.7071; my *= 0.7071; }
   const sp = keys.KeyC ? 170 : 340; // Cキーで低速移動
   P.x = clamp(P.x + mx * sp * dt, 30, W - 70);
-  P.y = clamp(P.y + my * sp * dt, 34, H - 30);
+  // 緩い重力：上下の入力がない間はゆっくり沈んでいく
+  if (my) P.vy = 0;
+  else P.vy = Math.min(P.vy + GRAVITY * dt, MAX_FALL);
+  P.y += (my * sp + P.vy) * dt;
+  if (P.y > H - 30) { P.y = H - 30; P.vy = 0; }
+  if (P.y < 34) P.y = 34;
   P.inv = Math.max(0, P.inv - dt);
   P.fire -= dt;
   if (P.fire <= 0 && clearT <= 0) { playerFire(); P.fire = 0.085; }
@@ -578,7 +585,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 resetField();
-P = { x: 150, y: H / 2, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
+P = { x: 150, y: H / 2, vy: 0, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
 score = 0;
 requestAnimationFrame(frame);
 </script>
