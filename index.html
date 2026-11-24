@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>VEAST Splendor</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+IDxkZWZzPiA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iNTAlIiBjeT0iNDAlIiByPSI3MCUiPiA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMxYjJhNWEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwNTA2MGYiLz4gPC9yYWRpYWxHcmFkaWVudD4gPGxpbmVhckdyYWRpZW50IGlkPSJhcm0iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4gPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYjljM2UwIi8+IDwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjYmcpIi8+IDxwYXRoIGQ9Ik0zMiAyNyBMOCA1IEwxMyA0IEwzMiAyMCBMNTEgNCBMNTYgNSBaIiBmaWxsPSIjZmZjYzMzIiBzdHJva2U9IiM4YTVhMDAiIHN0cm9rZS13aWR0aD0iMSIvPiA8cGF0aCBkPSJNMTQgMjcgTDIwIDIyIEwyMCA1MCBMMTQgNDQgWiIgZmlsbD0iIzhhOTRiOCIvPiA8cGF0aCBkPSJNNTAgMjcgTDQ0IDIyIEw0NCA1MCBMNTAgNDQgWiIgZmlsbD0iIzhhOTRiOCIvPiA8cGF0aCBkPSJNMjAgMjIgTDI4IDE3IEwzNiAxNyBMNDQgMjIgTDQ1IDQ2IEwzOCA1NiBMMjYgNTYgTDE5IDQ2IFoiIGZpbGw9InVybCgjYXJtKSIgc3Ryb2tlPSIjMmEzMzUwIiBzdHJva2Utd2lkdGg9IjEuNSIvPiA8cGF0aCBkPSJNMjkgMTkgTDM1IDE5IEwzMy41IDI0IEwzMC41IDI0IFoiIGZpbGw9IiNlODM0NGUiLz4gPHBhdGggZD0iTTIxIDI5IEwzMiAzMyBMNDMgMjkgTDQyIDM2IEwzMiAzOSBMMjIgMzYgWiIgZmlsbD0iIzA2MTIxZSIvPiA8cGF0aCBkPSJNMjMgMzEgTDMxIDM0IEwyOSAzNS41IEwyMyAzMy41IFoiIGZpbGw9IiMzZmYiLz4gPHBhdGggZD0iTTQxIDMxIEwzMyAzNCBMMzUgMzUuNSBMNDEgMzMuNSBaIiBmaWxsPSIjM2ZmIi8+IDxwYXRoIGQ9Ik0yNiA0NCBMMzggNDQgTDM2IDU0IEwyOCA1NCBaIiBmaWxsPSIjZTgzNDRlIi8+IDxwYXRoIGQ9Ik0yOSA0NiBMMzUgNDYgTTI5LjUgNDkgTDM0LjUgNDkiIHN0cm9rZT0iIzdhMTAyMiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4gPC9zdmc+">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   html,body{margin:0;height:100%;background:#05060f;overflow:hidden;
     touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
@@ -82,8 +84,149 @@ function sfx(k) {
   else if (k === 'start') { tone(440, 0.1, 'square', 0.08, 880); setTimeout(() => tone(880, 0.25, 'square', 0.08, 1760), 100); }
 }
 
+/* ---------- BGM（オリジナル曲・WebAudioでその場で合成） ---------- */
+// 記法: 1トークン=8分音符（drums/bass/arp は自動生成で16分刻み）。"-"=前の音を伸ばす "."=休符
+const SONGS = {
+  stage: { // 道中曲「Steel Horizon」 Aマイナー
+    bpm: 148, loop: true, drums: 'stage', bass: 'pump', arp: true,
+    chords: ['Am', 'F', 'G', 'Em', 'Am', 'F', 'G', 'E', 'F', 'G', 'Em', 'Am', 'Dm', 'G', 'E', 'E'],
+    lead: [
+      'E5 - A5 - B5 C6 B5 A5', 'C6 - - A5 F5 - A5 C6', 'D6 - - C6 B5 - G5 B5', 'B5 - - G5 E5 - - -',
+      'E5 - A5 - B5 C6 D6 E6', 'F6 - E6 - C6 - A5 -', 'B5 - D6 - G6 - F6 E6', 'E6 - - - D6 - B5 G#5',
+      'A5 - C6 - F6 - E6 -', 'D6 - - B5 G5 - B5 D6', 'E6 - D6 - B5 - G5 -', 'A5 - - - C6 - E6 -',
+      'F6 - E6 - D6 - A5 -', 'B5 - C6 - D6 - G6 -', 'G#5 - B5 - E6 - G#6 -', 'B6 - - - - - . .',
+    ],
+  },
+  boss: { // ボス曲「Grand Veast」 Eフリジアン
+    bpm: 168, loop: true, drums: 'boss', bass: 'drive', arp: false,
+    chords: ['Em', 'F', 'Em', 'D', 'C', 'B', 'Em', 'F'],
+    lead: [
+      'E5 - B4 E5 G5 - F#5 E5', 'F5 - - C5 F5 A5 G5 F5', 'E5 - B4 E5 G5 - B5 -', 'A5 - F#5 - D5 - F#5 A5',
+      'G5 - E5 - C6 - B5 A5', 'B5 - - D#6 - - F#6 -', 'E6 - D6 B5 G5 - E5 -', 'F5 - G5 - F5 E5 D#5 -',
+    ],
+  },
+  title: { // タイトル：静かなアルペジオ
+    bpm: 96, loop: true, drums: null, bass: 'long', arp: true,
+    chords: ['Am', 'F', 'C', 'G'],
+    lead: ['. . . . . . . .', 'E5 - - - D5 - C5 -', '. . . . . . . .', 'D5 - - - B4 - - -'],
+  },
+  clear: { // ボス撃破ファンファーレ
+    bpm: 150, loop: false, drums: null, bass: 'long', arp: false,
+    chords: ['C', 'C', 'F', 'G', 'C'],
+    lead: ['C5 E5 G5 C6 - - G5 C6', 'E6 - - - - - . .', 'F5 A5 C6 F6 - - E6 F6', 'G6 - - - F6 - D6 -', 'E6 - - - - - - -'],
+  },
+  over: { // ゲームオーバー
+    bpm: 84, loop: false, drums: null, bass: 'long', arp: false,
+    chords: ['Am', 'Dm', 'E', 'Am'],
+    lead: ['E5 - - - C5 - - -', 'D5 - - - A4 - - -', 'G#4 - - - B4 - - -', 'A4 - - - - - - -'],
+  },
+};
+const CHORDS = {
+  Am: ['A3', 'C4', 'E4'], F: ['F3', 'A3', 'C4'], G: ['G3', 'B3', 'D4'], Em: ['E3', 'G3', 'B3'], E: ['E3', 'G#3', 'B3'],
+  Dm: ['D3', 'F3', 'A3'], C: ['C3', 'E3', 'G3'], D: ['D3', 'F#3', 'A3'], B: ['B2', 'D#3', 'F#3'],
+};
+const DRUMS = { // k=キック s=スネア h=ハット（16分×16）
+  stage: { k: 'x.......x.x.....', s: '....x.......x...', h: '..x...x...x...x.' },
+  boss: { k: 'x...x...x...x..x', s: '....x.......x...', h: 'xxxxxxxxxxxxxxxx' },
+  fill: { k: 'x.......x.......', s: '....x...xxxxxxxx', h: '..x...x.........' },
+};
+function midi(n) {
+  const m = /^([A-G])(#|b)?(\d)$/.exec(n);
+  return { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + (+m[3] + 1) * 12;
+}
+const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+function compileSong(s) {
+  const bars = s.chords.length, steps = bars * 16, ev = Array.from({ length: steps }, () => []);
+  // メロディ
+  const toks = s.lead.join(' ').split(/\s+/);
+  for (let i = 0; i < toks.length; i++) {
+    if (toks[i] === '-' || toks[i] === '.') continue;
+    let len = 1; while (toks[i + len] === '-') len++;
+    ev[i * 2].push({ i: 'lead', m: midi(toks[i]), d: len * 2 });
+  }
+  for (let b = 0; b < bars; b++) {
+    const ch = CHORDS[s.chords[b]].map(midi), r = ch[0] - 12, o = b * 16;
+    // ベース
+    if (s.bass === 'pump') [0, 0, 12, 0, 0, 12, 0, 12].forEach((d, k) => ev[o + k * 2].push({ i: 'bass', m: r + d, d: 1.6 }));
+    else if (s.bass === 'drive') [0, 0, 12, 0, 0, 12, 0, 7, 0, 0, 12, 0, 1, 12, 10, 7].forEach((d, k) => ev[o + k].push({ i: 'bass', m: r + d, d: 0.9 }));
+    else ev[o].push({ i: 'bass', m: r, d: 15 });
+    // アルペジオ
+    if (s.arp) {
+      const a = [ch[0], ch[1], ch[2], ch[0] + 12, ch[2], ch[1], ch[0] + 12, ch[2]];
+      for (let k = 0; k < 16; k++) ev[o + k].push({ i: 'arp', m: a[k % 8] + 12, d: 0.9 });
+    }
+    // ドラム
+    if (s.drums) {
+      const p = DRUMS[s.drums === 'stage' && b === bars - 1 ? 'fill' : s.drums];
+      for (let k = 0; k < 16; k++) for (const d of 'ksh') if (p[d][k] === 'x') ev[o + k].push({ i: d });
+    }
+  }
+  return { ev, steps, spb: 60 / s.bpm / 4, loop: s.loop };
+}
+const SONG_DATA = {};
+for (const k in SONGS) SONG_DATA[k] = compileSong(SONGS[k]);
+
+let musicBus = null, curSong = null, songStep = 0, nextNoteT = 0, musicVol = -1;
+function voice(type, f, t, dur, vol, cutoff, det) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (det) o.detune.value = det;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(vol * 0.55, t + Math.min(dur, 0.25));
+  g.gain.setValueAtTime(vol * 0.55, t + dur);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.08);
+  let node = o;
+  if (cutoff) { const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = cutoff; o.connect(fl); node = fl; }
+  node.connect(g).connect(musicBus); o.start(t); o.stop(t + dur + 0.1);
+}
+function drum(k, t) {
+  if (k === 'k') {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+    g.gain.setValueAtTime(0.55, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+    o.connect(g).connect(musicBus); o.start(t); o.stop(t + 0.2);
+    return;
+  }
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), dur = k === 's' ? 0.16 : 0.035;
+  s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = k === 's' ? 1500 : 7000;
+  g.gain.setValueAtTime(k === 's' ? 0.22 : 0.07, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f).connect(g).connect(musicBus); s.start(t, Math.random() * 0.5); s.stop(t + dur);
+  if (k === 's') voice('triangle', 190, t, 0.03, 0.12);
+}
+function playSong(name) {
+  if (curSong === name) return;
+  curSong = name; songStep = 0; nextNoteT = ac ? ac.currentTime + 0.06 : 0;
+}
+function musicTick() {
+  if (!ac || !musicBus || !curSong || ac.state !== 'running') return;
+  const s = SONG_DATA[curSong];
+  if (nextNoteT < ac.currentTime - 0.2) nextNoteT = ac.currentTime + 0.05; // タブ復帰などで遅れたら追いつく
+  while (nextNoteT < ac.currentTime + 0.15) {
+    if (songStep >= s.steps) { if (!s.loop) return; songStep = 0; }
+    for (const e of s.ev[songStep]) {
+      const t = nextNoteT;
+      if (e.i === 'lead') {
+        const d = e.d * s.spb * 0.95, f = hz(e.m);
+        voice('square', f, t, d, 0.045, 3200, -6); voice('sawtooth', f, t, d, 0.035, 2600, 7);
+      } else if (e.i === 'bass') voice('sawtooth', hz(e.m), t, e.d * s.spb, 0.1, 700);
+      else if (e.i === 'arp') voice('square', hz(e.m), t, e.d * s.spb, 0.018, 1800);
+      else drum(e.i, t);
+    }
+    songStep++; nextNoteT += s.spb;
+  }
+}
+setInterval(musicTick, 25);
+function updateMusic() {
+  if (!ac) return;
+  if (!musicBus) { musicBus = ac.createGain(); musicBus.gain.value = 0; musicBus.connect(ac.destination); }
+  playSong(state === 'title' ? 'title' : state === 'over' ? 'over' : state === 'clear' || clearT > 0 ? 'clear' : bossSpawned ? 'boss' : 'stage');
+  const v = muted ? 0 : paused ? 0.25 : 0.55;
+  if (v !== musicVol) { musicVol = v; musicBus.gain.setTargetAtTime(v, ac.currentTime, 0.08); }
+}
+document.addEventListener('visibilitychange', () => { if (ac) { if (document.hidden) ac.suspend(); else if (state !== 'play') ac.resume(); } });
+
 /* ---------- State ---------- */
-let state = 'title', stateT = 0, paused = false, usedTouch = false;
+let state = 'title', stateT = 0, paused = false, usedTouch = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 let P, pb, eb, enemies, parts, items, t, spawnT, score, boss, bossSpawned, loop = 1, flash, shake, msg, clearT;
 let hi = 0;
 try { hi = +localStorage.getItem('veast_hi') || 0; } catch (e) {}
@@ -95,15 +238,16 @@ function resetField() {
 }
 function startGame() {
   loop = 1; score = 0; resetField();
-  P = { x: 150, y: H / 2, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
+  P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
   setState('play'); msg = { text: 'MISSION START', t: 2 }; sfx('start');
 }
 function nextLoop() {
   loop++; resetField();
-  P.x = 150; P.y = H / 2; P.hp = P.maxhp; P.inv = 2;
+  P.x = 150; P.y = H / 2; P.vy = 0; P.thrust = 0; P.upT = 0; P.hp = P.maxhp; P.inv = 2;
   setState('play'); msg = { text: 'LOOP ' + loop, t: 2 }; sfx('start');
 }
 function setState(s) { state = s; stateT = 0; paused = false; }
+const GRAVITY = 320, MAX_FALL = 210; // 自機にかかる重力(px/s²)と最大落下速度(px/s)
 const diff = () => (1 + t / 70) * (1 + (loop - 1) * 0.35);
 
 /* ---------- Input ---------- */
@@ -119,8 +263,15 @@ addEventListener('keydown', e => {
   } else if (['Enter', 'Space', 'KeyZ'].includes(e.code)) advance();
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
-addEventListener('blur', () => { for (const k in keys) keys[k] = false; if (state === 'play') paused = true; });
-document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') paused = true; });
+// LINE などのアプリ内ブラウザ(WebView)は、画面タップのたびに window の blur を発火することがある。
+// そのためタッチ操作中は blur でポーズせず、本当に画面が隠れたとき(visibilitychange / pagehide)だけポーズする。
+const autoPause = () => { if (state === 'play') paused = true; };
+addEventListener('blur', () => {
+  for (const k in keys) keys[k] = false;
+  if (!usedTouch) autoPause();
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
+addEventListener('pagehide', autoPause);
 addEventListener('contextmenu', e => e.preventDefault());
 
 const burstBtn = { x: W - 82, y: H - 82, r: 50 };
@@ -144,6 +295,8 @@ addEventListener('pointermove', e => {
   if (!drag || drag.id !== e.pointerId || state !== 'play' || paused) return;
   const p = toLogical(e);
   P.x += (p.x - drag.x) * 1.3; P.y += (p.y - drag.y) * 1.3;
+  if (Math.abs(p.y - drag.y) > 0.5) P.vy = 0; // 指で上下に動かしたら落下速度をリセット
+  if (p.y - drag.y < -0.5) P.upT = 0.12;       // 上方向へのドラッグ＝上昇噴射
   drag.x = p.x; drag.y = p.y;
 });
 const endDrag = e => { if (drag && drag.id === e.pointerId) drag = null; };
@@ -317,7 +470,15 @@ function update(dt) {
   if (mx && my) { mx *= 0.7071; my *= 0.7071; }
   const sp = keys.KeyC ? 170 : 340; // Cキーで低速移動
   P.x = clamp(P.x + mx * sp * dt, 30, W - 70);
-  P.y = clamp(P.y + my * sp * dt, 34, H - 30);
+  // 緩い重力：上下の入力がない間はゆっくり沈んでいく
+  if (my < 0) P.upT = 0.12;
+  P.upT = Math.max(0, (P.upT || 0) - dt);
+  P.thrust += ((P.upT > 0 ? 1 : 0) - P.thrust) * Math.min(1, dt * 12); // 噴射炎の大きさ(0〜1)をなめらかに変化
+  if (my) P.vy = 0;
+  else P.vy = Math.min(P.vy + GRAVITY * dt, MAX_FALL);
+  P.y += (my * sp + P.vy) * dt;
+  if (P.y > H - 30) { P.y = H - 30; P.vy = 0; }
+  if (P.y < 34) P.y = 34;
   P.inv = Math.max(0, P.inv - dt);
   P.fire -= dt;
   if (P.fire <= 0 && clearT <= 0) { playerFire(); P.fire = 0.085; }
@@ -398,9 +559,17 @@ function drawPlayer() {
   if (state === 'over') return;
   ctx.save(); ctx.translate(P.x, P.y); ctx.scale(1.25, 1.25);
   if (P.inv > 0 && Math.floor(P.inv * 20) % 2) ctx.globalAlpha = 0.35;
-  const f = 10 + Math.random() * 12;
-  poly([-24, -7, -24 - f, 0, -24, 7], '#4cf');
-  poly([-24, -4, -24 - f * 0.55, 0, -24, 4], '#fff');
+  const th = P.thrust || 0;                                                   // 上昇中は噴射炎が大きくなる
+  const f = (10 + Math.random() * 12) * (1 + th * 1.4), fw = 7 + th * 4;
+  poly([-24, -fw, -24 - f, 0, -24, fw], '#4cf');
+  poly([-24, -fw * 0.55, -24 - f * 0.55, 0, -24, fw * 0.55], '#fff');
+  if (th > 0.05) {                                                            // 足元の下向き噴射
+    const d = th * (14 + Math.random() * 12);
+    ctx.globalAlpha *= Math.min(1, th * 1.5);
+    poly([-26, 11, -20.5, 11 + d, -15, 11], '#4cf');
+    poly([-24, 11, -20.5, 11 + d * 0.55, -17, 11], '#fff');
+    ctx.globalAlpha = P.inv > 0 && Math.floor(P.inv * 20) % 2 ? 0.35 : 1;
+  }
   ctx.fillStyle = '#2a3350'; ctx.fillRect(-26, -13, 11, 24);                 // バックパック
   poly([-10, 7, -1, 7, -6, 23, -18, 23], '#8a94b8');                          // 脚
   poly([-18, 21, -4, 21, 2, 26, -18, 26], '#5a6488');
@@ -567,11 +736,11 @@ function draw() {
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
-  update(dt); draw();
+  update(dt); updateMusic(); draw();
   requestAnimationFrame(frame);
 }
 resetField();
-P = { x: 150, y: H / 2, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
+P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 0, lvl: 1, fire: 0, burst: 0 };
 score = 0;
 requestAnimationFrame(frame);
 </script>
