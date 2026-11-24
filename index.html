@@ -244,6 +244,12 @@ function startGame() {
   P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
   setState('play'); msg = { text: 'STAGE ' + loop + '  ' + STAGES[stageIdx()].name, t: 2.5 }; sfx('start');
 }
+function continueGame() {                      // CONTINUE：やられたステージの最初から（スコアは0から）
+  score = 0; resetField();
+  P = { x: 150, y: H / 2, vy: 0, thrust: 0, upT: 0, hp: 5, maxhp: 5, inv: 2, lvl: 1, fire: 0, burst: 0 };
+  setState('play'); msg = { text: 'STAGE ' + loop + '  ' + STAGES[stageIdx()].name, t: 2.5 }; sfx('start');
+}
+function mainMenu() { resetField(); loop = startStage; titleSel = 0; setState('title'); sfx('start'); }
 function nextLoop() {
   loop++; resetField();
   P.x = 150; P.y = H / 2; P.vy = 0; P.thrust = 0; P.upT = 0; P.hp = P.maxhp; P.inv = 2;
@@ -265,6 +271,7 @@ addEventListener('keydown', e => {
     else if (e.code === 'KeyX' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') triggerBurst();
   } else if (state === 'title') titleKey(e.code);
   else if (state === 'option') optionKey(e.code);
+  else if (state === 'over') overKey(e.code);
   else if (['Enter', 'Space', 'KeyZ'].includes(e.code)) advance();
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
@@ -292,6 +299,7 @@ addEventListener('pointerdown', e => {
   const p = toLogical(e);
   if (state === 'title') { titleTap(p); return; }
   if (state === 'option') { optionTap(p); return; }
+  if (state === 'over') { overTap(p); return; }
   if (state !== 'play') { advance(); return; }
   if (paused) { paused = false; return; }
   if (usedTouch && dist2(p, pauseBtn) < (pauseBtn.r + 14) ** 2) { paused = true; return; }
@@ -351,10 +359,24 @@ function optionTap(p) {
   else if (inBtn(p, optBtns.back)) closeOption();
 }
 
+// ゲームオーバー：CONTINUE / MAIN MENU（直前の操作で誤って押さないよう少し待ってから受け付ける）
+const overBtns = [{ id: 'cont', label: 'CONTINUE', x: W / 2 - 125, y: 410, w: 220, h: 52 }, { id: 'menu', label: 'MAIN MENU', x: W / 2 + 125, y: 410, w: 220, h: 52 }];
+let overSel = 0;
+function overKey(code) {
+  if (stateT < 1) return;
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS'].includes(code)) { overSel ^= 1; sfx('item'); }
+  else if (['Enter', 'Space', 'KeyZ'].includes(code)) overSel ? mainMenu() : continueGame();
+  else if (code === 'Escape') mainMenu();
+}
+function overTap(p) {
+  if (stateT < 1) return;
+  if (inBtn(p, overBtns[0])) continueGame();
+  else if (inBtn(p, overBtns[1])) mainMenu();
+}
+
 function advance() {
   if (stateT < 0.7) return;
-  if (state === 'over') startGame();
-  else if (state === 'clear') nextLoop();
+  if (state === 'clear') nextLoop();
 }
 
 /* ---------- Spawning ---------- */
@@ -444,7 +466,7 @@ function hurtPlayer() {
   if (P.inv > 0 || clearT > 0) return;
   P.hp--; P.inv = 2; P.lvl = Math.max(1, P.lvl - 1);
   explode(P.x, P.y, 1.2, '#4cf'); sfx('hit'); shake = 0.5; flash = 0.3;
-  if (P.hp <= 0) { explode(P.x, P.y, 3, '#4cf'); sfx('big'); saveHi(); setState('over'); }
+  if (P.hp <= 0) { explode(P.x, P.y, 3, '#4cf'); sfx('big'); saveHi(); setState('over'); overSel = 0; }
 }
 function triggerBurst() {
   if (state !== 'play' || paused || P.burst < 100) return;
@@ -915,7 +937,13 @@ function draw() {
   else if (state === 'option') drawOption();
   else {
     drawHUD();
-    if (state === 'over') drawOverlay('GAME OVER', 'TAP / ENTER でリトライ', '#ff3b6b');
+    if (state === 'over') {
+      drawOverlay('GAME OVER', '', '#ff3b6b');
+      if (stateT > 1) {
+        overBtns.forEach((b, i) => drawButton(b, b.label, overSel === i));
+        text('STAGE ' + loop + ' からやり直し（スコアは 0 から）', overBtns[0].x, 452, 12, '#9ab', 'center', '500');
+      }
+    }
     else if (state === 'clear') drawOverlay('MISSION CLEAR', 'TAP / ENTER で次のステージへ', '#7ff');
     else if (paused) {
       ctx.fillStyle = 'rgba(5,6,15,0.55)'; ctx.fillRect(0, 0, W, H);
