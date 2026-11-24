@@ -676,7 +676,7 @@ function drawClouds(col) {
 }
 function forEachLoop(o, list, fn) { for (let k = 0; k < 2; k++) for (const it of list) { const x = it.x - o.off + k * o.len; if (x > -100 && x < W + 100) fn(it, x); } }
 function drawForest() {
-  sky([[0, '#4aa6f0'], [0.55, '#a8dcff'], [1, '#e6f6ff']]);
+  sky([[0, '#3a88cc'], [0.55, '#86bde4'], [1, '#bcd9ec']]);
   drawSun(800, 90, 34, '#fffbe0', 'rgba(255,250,210,0.55)');
   drawClouds('rgba(255,255,255,0.85)');
   drawRidge(mtnFar, '#8fb8c8');                                  // 遠景の山（青く霞む）
@@ -698,7 +698,7 @@ function drawForest() {
   ctx.fillStyle = '#1d4a27'; ctx.fillRect(0, H - 30, W, 30);    // 手前の地面
 }
 function drawDesert() {
-  sky([[0, '#3d8fe0'], [0.5, '#9fd0f5'], [0.8, '#ffe6b8'], [1, '#ffd08a']]);
+  sky([[0, '#2f74bc'], [0.5, '#7fb2da'], [0.8, '#e2c493'], [1, '#e0ad6c']]);
   drawSun(180, 110, 40, '#fffef2', 'rgba(255,240,180,0.6)');
   ctx.globalAlpha = 0.6; drawClouds('#ffffff'); ctx.globalAlpha = 1;
   forEachLoop(mesas, mesas.m, (m, x) => {                        // 遠景の岩山（メサ）
