@@ -1,45 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
-      <stop offset="0" stop-color="#1a2a4e"/><stop offset="0.6" stop-color="#0b1122"/><stop offset="1" stop-color="#05060f"/>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#203a6e"/><stop offset="0.45" stop-color="#0e1730"/><stop offset="1" stop-color="#04050c"/>
     </radialGradient>
-    <linearGradient id="w" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f4f7fc"/><stop offset="1" stop-color="#b9c3d8"/>
-    </linearGradient>
-    <linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3a4258"/><stop offset="1" stop-color="#151a26"/>
-    </linearGradient>
-    <linearGradient id="g" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#ffb21f"/><stop offset="1" stop-color="#ffe27a"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#3ff0ff" stop-opacity="0.75"/><stop offset="1" stop-color="#3ff0ff" stop-opacity="0"/>
+    <radialGradient id="rim" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3ff0ff" stop-opacity="0.55"/><stop offset="0.5" stop-color="#2a7cff" stop-opacity="0.18"/><stop offset="1" stop-color="#2a7cff" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3ff0ff" stop-opacity="0"/><stop offset="1" stop-color="#3ff0ff" stop-opacity="0.16"/>
+    </linearGradient>
+    <!-- 白装甲：明面・暗面・上面 -->
+    <linearGradient id="wl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d3e6"/></linearGradient>
+    <linearGradient id="wr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b3bed6"/><stop offset="1" stop-color="#6d7894"/></linearGradient>
+    <linearGradient id="wt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3e9f5"/></linearGradient>
+    <linearGradient id="wb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe6f3"/><stop offset="1" stop-color="#8f9ab5"/></linearGradient>
+    <!-- ガンメタ -->
+    <linearGradient id="dl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#56607c"/><stop offset="1" stop-color="#262d40"/></linearGradient>
+    <linearGradient id="dr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2c3347"/><stop offset="1" stop-color="#11151f"/></linearGradient>
+    <!-- 金属ゴールド -->
+    <linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c2"/><stop offset="0.5" stop-color="#ffc83d"/><stop offset="1" stop-color="#e09a12"/></linearGradient>
+    <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c47f0c"/><stop offset="1" stop-color="#6e4300"/></linearGradient>
+    <!-- 赤パーツ -->
+    <linearGradient id="rl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8197"/><stop offset="1" stop-color="#e8203f"/></linearGradient>
+    <linearGradient id="rr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c41535"/><stop offset="1" stop-color="#6e0618"/></linearGradient>
+    <!-- バイザー（ガラス） -->
+    <linearGradient id="vz" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8ffff"/><stop offset="0.35" stop-color="#3ff0ff"/><stop offset="1" stop-color="#0a7fb8"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7"/><feOffset dx="5" dy="9" result="b"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.65"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bloom" x="-50%" y="-100%" width="200%" height="300%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clip"><rect width="256" height="256" rx="56"/></clipPath>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- 後ろへ流れるブレードアンテナ -->
-  <path d="M29 22 L6 7 L9 5.5 L31 17 Z" fill="url(#g)" stroke="#7a5200" stroke-width="0.6"/>
-  <path d="M35 22 L58 7 L55 5.5 L33 17 Z" fill="url(#g)" stroke="#7a5200" stroke-width="0.6"/>
-  <path d="M27 19 L14 4 L17 3.5 L30 16 Z" fill="url(#g)" stroke="#7a5200" stroke-width="0.6"/>
-  <path d="M37 19 L50 4 L47 3.5 L34 16 Z" fill="url(#g)" stroke="#7a5200" stroke-width="0.6"/>
-  <!-- 側頭部（ガンメタ） -->
-  <path d="M13 28 L19 21 L20 48 L14 42 Z" fill="url(#d)" stroke="#0b0f18" stroke-width="0.8"/>
-  <path d="M51 28 L45 21 L44 48 L50 42 Z" fill="url(#d)" stroke="#0b0f18" stroke-width="0.8"/>
-  <path d="M15 31 L18 28 M49 31 L46 28" stroke="#3ff0ff" stroke-width="1.2" stroke-linecap="round"/>
-  <!-- ヘルメット -->
-  <path d="M19 22 L27 15 L37 15 L45 22 L46 33 L18 33 Z" fill="url(#w)" stroke="#1a2236" stroke-width="1.2"/>
-  <path d="M26 17 L32 15.5 L38 17 L36 22 L28 22 Z" fill="url(#d)"/>
-  <path d="M29.5 17.5 L34.5 17.5 L33.5 21 L30.5 21 Z" fill="#ff3d5a"/>
-  <path d="M21 25 L28 23.5 M43 25 L36 23.5" stroke="rgba(20,28,45,0.5)" stroke-width="0.9"/>
-  <!-- フェイス -->
-  <path d="M18 33 L46 33 L44 47 L37 55 L27 55 L20 47 Z" fill="url(#w)" stroke="#1a2236" stroke-width="1.2"/>
-  <path d="M19 31 L45 31 L43.5 39 L32 41.5 L20.5 39 Z" fill="#0a0f1a"/>
-  <!-- バイザー（発光） -->
-  <ellipse cx="32" cy="35.5" rx="17" ry="7" fill="url(#glow)"/>
-  <path d="M21.5 34 L32 36 L42.5 34 L41.5 36.6 L32 38.4 L22.5 36.6 Z" fill="#3ff0ff"/>
-  <path d="M25 35.2 L32 36.6 L39 35.2" stroke="#ffffff" stroke-width="0.8" fill="none" stroke-linecap="round"/>
-  <!-- 頬のダクト・口元 -->
-  <path d="M21 42 L26 43 L25 47 L22 46 Z M43 42 L38 43 L39 47 L42 46 Z" fill="url(#d)"/>
-  <path d="M28 45 L36 45 L35 53 L29 53 Z" fill="#ff3d5a" stroke="#7a1022" stroke-width="0.6"/>
-  <path d="M29.5 47.5 L34.5 47.5 M30 50 L34 50" stroke="#7a1022" stroke-width="1"/>
+
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <g clip-path="url(#clip)">
+  <ellipse cx="128" cy="120" rx="118" ry="104" fill="url(#rim)"/>
+  <rect y="176" width="256" height="80" fill="url(#floor)"/>
+  <path d="M0 214 H256 M0 236 H256 M128 176 L40 256 M128 176 L216 256 M128 176 L128 256" stroke="#3ff0ff" stroke-opacity="0.12" stroke-width="1.5"/>
+  </g>
+
+  <g filter="url(#shadow)" stroke-linejoin="round">
+    <!-- ブレードアンテナ（外側） -->
+    <path d="M118 84 L22 24 L112 98 Z" fill="url(#gl)"/>
+    <path d="M118 84 L22 24 L124 70 Z" fill="url(#gd)"/>
+    <path d="M138 84 L234 24 L144 98 Z" fill="url(#gd)"/>
+    <path d="M138 84 L234 24 L132 70 Z" fill="url(#gl)" opacity="0.85"/>
+    <!-- ブレードアンテナ（内側） -->
+    <path d="M114 74 L56 10 L108 84 Z" fill="url(#gl)"/>
+    <path d="M114 74 L56 10 L122 62 Z" fill="url(#gd)"/>
+    <path d="M142 74 L200 10 L148 84 Z" fill="url(#gd)"/>
+    <path d="M142 74 L200 10 L134 62 Z" fill="url(#gl)" opacity="0.85"/>
+    <path d="M24 25 L116 84 M58 11 L113 74" stroke="#fffbe0" stroke-width="1.6" stroke-opacity="0.9"/>
+
+    <!-- 側頭部 -->
+    <path d="M52 112 L76 82 L80 194 L56 168 Z" fill="url(#dl)"/>
+    <path d="M52 112 L64 97 L68 182 L56 168 Z" fill="url(#dr)" opacity="0.6"/>
+    <path d="M204 112 L180 82 L176 194 L200 168 Z" fill="url(#dr)"/>
+    <path d="M60 124 L72 110 M196 124 L184 110" stroke="#3ff0ff" stroke-width="4" stroke-linecap="round" filter="url(#bloom)"/>
+
+    <!-- ヘルメット：上面・左面（明）・右面（暗） -->
+    <path d="M106 58 L150 58 L166 74 L90 74 Z" fill="url(#wt)"/>
+    <path d="M76 90 L90 74 L128 74 L128 132 L72 132 Z" fill="url(#wl)"/>
+    <path d="M128 74 L166 74 L180 90 L184 132 L128 132 Z" fill="url(#wr)"/>
+    <path d="M76 90 L90 74 L166 74" stroke="#ffffff" stroke-width="2" fill="none" stroke-opacity="0.9"/>
+    <path d="M90 74 L106 58 L150 58" stroke="#ffffff" stroke-width="1.5" fill="none" stroke-opacity="0.8"/>
+    <!-- 額のクレスト＆センサー -->
+    <path d="M114 60 L142 60 L146 88 L128 96 L110 88 Z" fill="url(#dl)"/>
+    <path d="M128 60 L142 60 L146 88 L128 96 Z" fill="url(#dr)"/>
+    <path d="M121 66 L135 66 L132 84 L124 84 Z" fill="#ff3d5a" filter="url(#bloom)"/>
+    <path d="M122 67 L128 67 L127 76 L124 76 Z" fill="#ffd0d8"/>
+
+    <!-- 顔：左面（明）・右面（暗） -->
+    <path d="M72 132 L128 132 L128 222 L108 222 L80 190 Z" fill="url(#wb)"/>
+    <path d="M128 132 L184 132 L176 190 L148 222 L128 222 Z" fill="url(#wr)"/>
+    <path d="M128 132 L128 222" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5"/>
+    <!-- バイザーのくぼみ -->
+    <path d="M74 122 L182 122 L176 158 L128 170 L80 158 Z" fill="#070b14"/>
+    <path d="M80 158 L128 170 L176 158" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" fill="none"/>
+    <!-- バイザー（発光ガラス） -->
+    <path d="M84 134 L128 143 L172 134 L168 148 L128 156 L88 148 Z" fill="url(#vz)" filter="url(#bloom)"/>
+    <path d="M94 138 L128 145 L150 140.5" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" stroke-opacity="0.95"/>
+    <!-- 頬ダクト -->
+    <path d="M84 170 L104 174 L100 192 L88 186 Z" fill="url(#dl)"/>
+    <path d="M172 170 L152 174 L156 192 L168 186 Z" fill="url(#dr)"/>
+    <path d="M88 176 L101 179 M89 182 L100 185 M168 176 L155 179 M167 182 L156 185" stroke="#0b0f18" stroke-width="2"/>
+    <!-- 口元ガード -->
+    <path d="M112 180 L128 180 L128 214 L116 214 Z" fill="url(#rl)"/>
+    <path d="M128 180 L144 180 L140 214 L128 214 Z" fill="url(#rr)"/>
+    <path d="M112 180 L144 180" stroke="#ffd0d8" stroke-width="2"/>
+    <path d="M117 191 L139 191 M118 200 L138 200" stroke="#5a0414" stroke-width="3"/>
+    <!-- 輪郭の締め -->
+    <path d="M76 90 L90 74 L106 58 L150 58 L166 74 L180 90 L184 132 L176 190 L148 222 L108 222 L80 190 L72 132 Z" fill="none" stroke="#0b1020" stroke-width="2.5"/>
+  </g>
 </svg>
