@@ -33,7 +33,7 @@
 ## 技術メモ
 
 - HTML5 Canvas と素のJavaScriptのみ（外部ライブラリなし・画像なし）
-- favicon（V字アンテナのロボット頭部）は index.html に埋め込み済み。元データは `favicon.svg`、iOSホーム画面用は `apple-touch-icon.png`
+- favicon（自機の頭部：金のブレードアンテナ＋発光バイザー）は index.html に埋め込み済み。元データは `favicon.svg`、iOSホーム画面用は `apple-touch-icon.png`
 - 効果音・BGMは WebAudio でその場で合成（音声ファイルなし）
 - BGMはオリジナル曲：道中「Steel Horizon」（Aマイナー・148BPM）、ボス「Grand Veast」（Eフリジアン・168BPM）、ほかタイトル／クリア／ゲームオーバー
 - 論理解像度は 960×540。画面サイズに合わせて拡大縮小します
